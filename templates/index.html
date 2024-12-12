@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Left sidebar -->
+        <div class="sidebar">
+            {% for id, text in prompts.items() %}
+            <div class="prompt" data-id="{{ id }}">
+                {{ text }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <h1>Prompt Tracker</h1>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                {% for i in range(1, 6) %}
+                <button class="tab" data-tab="{{ i }}">Privacy Policy {{ i }}</button>
+                {% endfor %}
+            </div>
+
+            <!-- Content area -->
+            <div class="content-area">
+                <div id="content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const prompts = document.querySelectorAll('.prompt');
+            const tabs = document.querySelectorAll('.tab');
+            const content = document.getElementById('content');
+
+            // Set first tab as active by default
+            tabs[0].classList.add('active');
+            loadContent(1);
+
+            // Handle prompt clicks
+            prompts.forEach(prompt => {
+                prompt.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    // Remove active class from all prompts
+                    prompts.forEach(p => p.classList.remove('active'));
+                    // Add active class to clicked prompt
+                    this.classList.add('active');
+                    // Activate corresponding tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabs[id-1].classList.add('active');
+                    loadContent(id);
+                });
+            });
+
+            // Handle tab clicks
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const id = this.dataset.tab;
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    loadContent(id);
+                });
+            });
+
+            // Load content for tab
+            function loadContent(tabId) {
+                fetch(`/get_content/${tabId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Direct HTML insertion for both types
+                        content.innerHTML = data.content;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        content.innerHTML = 'Error loading content';
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
