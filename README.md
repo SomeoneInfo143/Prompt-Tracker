@@ -125,7 +125,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Flask for the web framework
 - diff-match-patch for the text comparison functionality
-- Contributors and testers of the project
 
 ## Support
 
